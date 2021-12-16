@@ -22,8 +22,13 @@ public class Task1 implements Task {
     // !!! Редактируйте этот метод !!!
     private List<Person> findOrderedPersons(List<Integer> personIds) {
         Set<Person> persons = PersonService.findPersons(personIds);
-        // Ассимптотическая сложность алгоритма O(nlogn)
-        return persons.stream().sorted(Comparator.comparing(Person::getId)).collect(Collectors.toList());
+        // Ассимптотическая сложность алгоритма O(n*m)
+        return personIds.stream()
+                .map(id -> persons.stream()
+                        .filter(person -> person.getId().equals(id))
+                        .findAny().orElse(null)
+                )
+                .collect(Collectors.toList());
     }
 
     @Override

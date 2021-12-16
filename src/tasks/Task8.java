@@ -3,6 +3,7 @@ package tasks;
 import common.Person;
 import common.Task;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,7 +21,11 @@ public class Task8 implements Task {
 
     //Не хотим выдывать апи нашу фальшивую персону, поэтому конвертим начиная со второй
     public List<String> getNames(List<Person> persons) {
-        return persons.stream().skip(1).map(person -> getPersonNames(persons).get(person.getId())).collect(Collectors.toList());
+        Map<Integer, String> personNames = getPersonNames(persons);
+        return persons.stream()
+                .skip(1)
+                .map(person -> personNames.get(person.getId()))
+                .collect(Collectors.toList());
     }
 
     //ну и различные имена тоже хочется
@@ -30,12 +35,14 @@ public class Task8 implements Task {
 
     //Для фронтов выдадим полное имя, а то сами не могут
     public String convertPersonToString(Person person) {
-        return person != null ? (person.getFirstName() + " " + person.getSecondName()).trim() : "";
+        return person == null ? "" : ((person.getFirstName() == null ? "" : (person.getFirstName().trim() + " "))
+                + (person.getSecondName() == null ? "" : person.getSecondName().trim()));
     }
 
     // словарь id персоны -> ее имя
     public Map<Integer, String> getPersonNames(Collection<Person> persons) {
-        return persons.stream().collect(Collectors.toMap(Person::getId, this::convertPersonToString));
+        return new HashSet<>(persons).stream()
+                .collect(Collectors.toMap(Person::getId, this::convertPersonToString));
     }
 
     // есть ли совпадающие в двух коллекциях персоны?
@@ -53,7 +60,7 @@ public class Task8 implements Task {
     @Override
     public boolean check() {
         System.out.println("Слабо дойти до сюда и исправить Fail этой таски?");
-        boolean codeSmellsGood = false;
+        boolean codeSmellsGood = true;
         boolean reviewerDrunk = false;
         return codeSmellsGood || reviewerDrunk;
     }

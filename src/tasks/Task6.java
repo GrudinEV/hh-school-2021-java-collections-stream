@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
 Имеются
@@ -24,12 +25,15 @@ public class Task6 implements Task {
     private Set<String> getPersonDescriptions(Collection<Person> persons,
                                               Map<Integer, Set<Integer>> personAreaIds,
                                               Collection<Area> areas) {
+        Map<Integer, String> actualAreas = areas.stream()
+                .filter(area -> personAreaIds.values().stream()
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toSet()).contains(area.getId())
+                ).collect(Collectors.toMap(Area::getId, Area::getName));
+
         return persons.stream()
-                .flatMap(person -> personAreaIds.get(person.getId()).stream().map(
-                                areaId -> person.getFirstName() + " - " + areas.stream().filter(a -> a.getId().equals(areaId))
-                                        .map(Area::getName).findFirst().orElse("Unknown territory!")
-                        )
-                )
+                .flatMap(person -> personAreaIds.get(person.getId()).stream()
+                        .map(areaId -> person.getFirstName() + " - " + actualAreas.get(areaId)))
                 .collect(Collectors.toSet());
     }
 
