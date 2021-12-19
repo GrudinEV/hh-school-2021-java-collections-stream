@@ -35,21 +35,23 @@ public class Task8 implements Task {
 
     //Для фронтов выдадим полное имя, а то сами не могут
     public String convertPersonToString(Person person) {
-        return person == null ? "" : ((person.getFirstName() == null ? "" : (person.getFirstName().trim() + " "))
-                + (person.getSecondName() == null ? "" : person.getSecondName().trim()));
+        if (person == null) {
+            return "";
+        }
+        return Stream.of(person.getSecondName(), person.getFirstName(), person.getMiddleName())
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(" "));
     }
 
     // словарь id персоны -> ее имя
     public Map<Integer, String> getPersonNames(Collection<Person> persons) {
-        return new HashSet<>(persons).stream()
-                .collect(Collectors.toMap(Person::getId, this::convertPersonToString));
+        return persons.stream()
+                .collect(Collectors.toMap(Person::getId, this::convertPersonToString, (fullName1, fullName2) -> fullName1));
     }
 
     // есть ли совпадающие в двух коллекциях персоны?
     public boolean hasSamePersons(Collection<Person> persons1, Collection<Person> persons2) {
-        List<Person> newPersons = new ArrayList<>(persons1);
-        newPersons.addAll(persons2);
-        return getDifferentNames(newPersons).size() != persons1.size() + persons2.size();
+        return persons1.stream().anyMatch(persons2::contains);
     }
 
     //...
@@ -59,7 +61,7 @@ public class Task8 implements Task {
 
     @Override
     public boolean check() {
-        System.out.println("Слабо дойти до сюда и исправить Fail этой таски?");
+         System.out.println("Слабо дойти до сюда и исправить Fail этой таски?");
         boolean codeSmellsGood = true;
         boolean reviewerDrunk = false;
         return codeSmellsGood || reviewerDrunk;
